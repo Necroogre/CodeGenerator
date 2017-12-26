@@ -16,7 +16,13 @@
         </div>
     </Upload>        
     </Row>
-    <br>
+    <Row>
+    <Button @click="exportFile" type="primary" shape="circle" style="float:right">
+      <Icon type="forward"></Icon>
+      <span>导出</span>
+    </Button>
+    </Row>
+    <br>   
     <pre>
       {{code }}
     </pre>
@@ -46,18 +52,23 @@ export default {
     },
     handleBeforeUpload(file) {
       let vm = this;
-      let path = file.path;
-      let key = vm.key;
-      let replaceJson = "";
       try {
-        replaceJson = JSON.parse(key);
+        let path = file.path;
+        let key = vm.key;
+
+        let replaceJson = JSON.parse(key);
+
+        let content = ipcRenderer.sendSync("getContent", path);
+        let text = _.template(content)(replaceJson);
+        vm.code = text;
       } catch (e) {
         vm.$Message.error(e.message);
         return;
       }
-      let content = ipcRenderer.sendSync("getContent", path);
-      let text = _.template(content)(replaceJson);
-      vm.code = text;
+    },
+    exportFile() {
+      let vm = this;
+      ipcRenderer.send("export", vm.code);
     }
   }
 };

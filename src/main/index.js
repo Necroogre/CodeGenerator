@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain } from 'electron'
+import { app, BrowserWindow, ipcMain, dialog } from 'electron'
 var fs = require("fs");
 /**
  * Set `__static` path to static files in production
@@ -56,4 +56,10 @@ ipcMain.on('findTmpls', (event, arg) => {
 ipcMain.on('getContent', (event, arg) => {
   var buffer = fs.readFileSync(arg);
   event.returnValue = buffer.toString();
+})
+
+ipcMain.on('export', (event, arg) => {
+  dialog.showSaveDialog(function (filename) {
+    fs.appendFile(filename,arg);
+  });
 })
