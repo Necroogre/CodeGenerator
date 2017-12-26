@@ -8,6 +8,7 @@
     <Upload
         multiple
         type="drag"
+        :show-upload-list="false"
         :before-upload="handleBeforeUpload"
         action="//jsonplaceholder.typicode.com/posts/">
         <div style="padding: 20px 0">
@@ -16,6 +17,7 @@
         </div>
     </Upload>        
     </Row>
+    <br>
     <Row>
     <Button @click="exportFile" type="primary" shape="circle" style="float:right">
       <Icon type="forward"></Icon>
