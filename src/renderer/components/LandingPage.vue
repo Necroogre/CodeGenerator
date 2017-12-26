@@ -68,6 +68,10 @@ export default {
     },
     exportFile() {
       let vm = this;
+      if (_.isEmpty(vm.code)) {
+        vm.$Message.error("请先上传模板");
+        return false;
+      }
       ipcRenderer.send("export", vm.code);
     }
   }
