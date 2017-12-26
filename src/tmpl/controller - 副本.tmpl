@@ -1,0 +1,102 @@
+using System.Collections.Generic;
+using System.Web.Mvc;
+using Accounting.Web.Extensions;
+using Accounting.Web.Infrastructure;
+using Common;
+using DataModels.DTO.ConfigModel;
+using DataModels.DTO.ResultModel;
+using DataModels.ViewModel;
+using <%=name%>Query = DataModels.ViewModel.QueryModel.<%=name%>Query;
+
+namespace Accounting.Web.Controllers
+{
+    public class <%=name%>Controller : BaseController
+    {
+        [Permission(Constants.<%=name%>, PermissionOperation.Search)]
+        public ActionResult Index(<%=name%>Query query)
+        {
+            ViewBag.query = query;
+            return View();
+        }
+
+        #region api
+        [Permission(Constants.<%=name%>, PermissionOperation.Search)]
+        public ActionResult List(<%=name%>Query query)
+        {
+            query.Pagination = query.Pagination ?? new Pagination();
+            var param = query.MapTo<<%=name%>Query, DataModels.DTO.QueryModel.<%=name%>Query>();
+            var list = ManagersProvider.<%=name%>Platform().Query<%=name%>(param);
+            var mappedList = list.MapToList<BA_<%=name%>, <%=name%>ViewModel>();
+            var result = new ReturnInfo
+            {
+                Data = new
+                {
+                    list = mappedList,
+                    pagination = param.Pagination
+                }
+            };
+            return Json(result, JsonRequestBehavior.AllowGet);
+        }
+
+        public ActionResult Add(<%=name%>ViewModel vm)
+        {
+            var dto = vm.MapTo<<%=name%>ViewModel, BA_<%=name%>>();
+            var dtoList = new List<BA_<%=name%>>
+                {
+                    dto
+                };
+            ManagersProvider.<%=name%>Platform().Add<%=name%>(dtoList);
+            var result = new ReturnInfo();
+            return Json(result, JsonRequestBehavior.DenyGet);
+        }
+
+        public ActionResult Update(<%=name%>ViewModel vm)
+        {
+            var dto = vm.MapTo<<%=name%>ViewModel, BA_<%=name%>>();
+            var dtoList = new List<BA_<%=name%>>
+                {
+                    dto
+                };
+            ManagersProvider.<%=name%>Platform().Update<%=name%>(dtoList);
+            var result = new ReturnInfo();
+            return Json(result, JsonRequestBehavior.DenyGet);
+        }
+
+        public ActionResult Delete(List<<%=name%>ViewModel> vmList)
+        {
+            var dtoList = vmList.MapToList<<%=name%>ViewModel, BA_<%=name%>>();
+            ManagersProvider.<%=name%>Platform().Delete<%=name%>(dtoList);
+            var result = new ReturnInfo();
+            return Json(result, JsonRequestBehavior.DenyGet);
+        }
+
+        public ActionResult Enable(List<<%=name%>ViewModel> vmList)
+        {
+            var dtoList = vmList.MapToList<<%=name%>ViewModel, BA_<%=name%>>();
+            ManagersProvider.<%=name%>Platform().Enable<%=name%>(dtoList);
+            var result = new ReturnInfo();
+            return Json(result, JsonRequestBehavior.DenyGet);
+        }
+
+
+        public ActionResult GetCommonData()
+        {
+            var commonData = this.CommonModelHelper.GetCommonData(CommonDataType.CommodityType);
+
+            #region permission
+            var list = ManagersProvider.PermissionPlatform.GetUserObjectOperation(Constants.<%=name%>, UserInfo.Code);
+            var permission = list.MapTo<UserObjectOperation, UserObjectOperationViewModel>();
+            commonData.Add("permission", permission);
+            #endregion
+
+            var result = new ReturnInfo()
+            {
+                Data = commonData
+            };
+            return Json(result, JsonRequestBehavior.AllowGet);
+        }
+        #endregion
+
+
+    }
+}
