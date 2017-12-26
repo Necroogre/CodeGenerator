@@ -1,7 +1,7 @@
 <template>
   <div id="wrapper">
     <Row>
-      <Input v-model="key" placeholder='JsonObj:{"name":"Hello"}'></Input>
+      <Input v-model="key" placeholder='JsonObj:{"name":"Hello"}' size="large"></Input>
     </Row>
     <br>
     <Row>
