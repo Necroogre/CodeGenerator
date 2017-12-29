@@ -1,82 +1,26 @@
 <template>
   <div id="wrapper">
-    <Row>
-      <Input v-model="key" placeholder='JsonObj:{"name":"Hello"}' size="large"></Input>
-    </Row>
-    <br>
-    <Row>
-    <Upload
-        multiple
-        type="drag"
-        :show-upload-list="false"
-        :before-upload="handleBeforeUpload"
-        action="//jsonplaceholder.typicode.com/posts/">
-        <div style="padding: 20px 0">
-            <Icon type="ios-cloud-upload" size="52" style="color: #3399ff"></Icon>
-            <p>Click here to upload</p>
-        </div>
-    </Upload>        
-    </Row>
-    <br>
-    <Row>
-    <Button @click="exportFile" type="primary" shape="circle" style="float:right">
-      <Icon type="forward"></Icon>
-      <span>导出</span>
-    </Button>
-    </Row>
-    <br>   
-    <pre>
-      {{code }}
-    </pre>
+    <Tabs value="name1">
+        <TabPane label="单文件生成" name="name1" icon="android-person">
+          <tab1></tab1>
+        </TabPane>
+        <TabPane label="批量生成" name="name2" icon="android-people">
+          <tab2></tab2> 
+        </TabPane>
+    </Tabs>
   </div>
 </template>
 
 <script>
-import SystemInformation from "./LandingPage/SystemInformation";
+import tab1 from "./Tab1";
+import tab2 from "./Tab2";
+
 import { ipcRenderer } from "electron";
 import _ from "lodash";
 
 export default {
   name: "landing-page",
-  data() {
-    return {
-      tmpls: [{ text: "moban1" }, { text: "moban2" }],
-      checkedNames: [],
-      key: '{"name":"Hello"}',
-      code: ""
-    };
-  },
-  created() {},
-  components: { SystemInformation },
-  methods: {
-    open(link) {
-      this.$electron.shell.openExternal(link);
-    },
-    handleBeforeUpload(file) {
-      let vm = this;
-      try {
-        let path = file.path;
-        let key = vm.key;
-
-        let replaceJson = JSON.parse(key);
-
-        let content = ipcRenderer.sendSync("getContent", path);
-        let text = _.template(content)(replaceJson);
-        vm.code = text;
-      } catch (e) {
-        vm.$Message.error(e.message);
-        return;
-      }
-    },
-    exportFile() {
-      let vm = this;
-      if (_.isEmpty(vm.code)) {
-        vm.$Message.error("请先上传模板");
-        return false;
-      }
-      ipcRenderer.send("export", vm.code);
-    }
-  }
+  components: { tab1, tab2 }
 };
 </script>
 
